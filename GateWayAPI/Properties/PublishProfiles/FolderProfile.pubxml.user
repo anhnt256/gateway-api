@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Project\GateWay\public</_PublishTargetUrl>
+    <History>True|2022-05-01T19:52:25.1177969Z;True|2022-05-02T02:38:39.7961468+07:00;True|2022-05-02T00:19:07.3637236+07:00;True|2022-05-02T00:16:13.5296361+07:00;True|2022-05-02T00:09:21.5275097+07:00;True|2022-05-01T23:58:54.8243530+07:00;True|2022-05-01T16:44:10.0721761+07:00;True|2022-05-01T16:33:19.7562656+07:00;True|2022-05-01T16:27:47.3916168+07:00;False|2022-05-01T16:26:13.9397930+07:00;False|2022-05-01T16:24:01.9160619+07:00;False|2022-05-01T16:23:46.8986319+07:00;True|2022-05-01T16:17:11.0526057+07:00;True|2022-05-01T16:10:15.2798464+07:00;True|2022-05-01T16:01:15.2110997+07:00;True|2022-05-01T14:09:08.7385756+07:00;</History>
+  </PropertyGroup>
+</Project>
