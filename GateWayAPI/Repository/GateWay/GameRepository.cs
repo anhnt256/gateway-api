@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Data;
+using GateWayAPI.Models.General.GameResultModel;
+using GateWayAPI.Models.GateWay.GameResultDetail;
 
 namespace GateWayAPI.Repository.GateWay
 {
@@ -23,6 +26,17 @@ namespace GateWayAPI.Repository.GateWay
             {
                 var sql = "Select * from Game";
                 return conn.Query<Game>(sql).ToList();
+            }
+        }
+
+        public List<GameParamClient> SelectAllGameParamClient(int gameId)
+        {
+            using (var conn = GetOpenConnection())
+            {
+                var sql = "Select * from GameParam where gameId = @gameId";
+                var parameters = new DynamicParameters();
+                parameters.Add("@gameId", gameId, System.Data.DbType.Int32);
+                return conn.Query<GameParamClient>(sql, parameters).ToList();
             }
         }
 
@@ -128,11 +142,37 @@ namespace GateWayAPI.Repository.GateWay
             }
         }
 
-        public bool UseCode(string code)
+        public GameResultModel GetResultByCode(string code)
         {
             using (var conn = GetOpenConnection())
             {
-                return conn.Update(new GameResult { Code = code, IsUsed = 1 });
+                var procedure = "[sp_Admin_GetGameResultByCode]";
+                DynamicParameters _params = new DynamicParameters();
+                _params.Add("@Code", code, DbType.String);
+
+                return conn.QueryFirstOrDefault<GameResultModel>(procedure, _params, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public bool UseCode(GameResultModel gameResult)
+        {
+            using (var conn = GetOpenConnection())
+            {
+                var sql = "update GameResult set isUsed = 1, ExchangeBy = @ExChangeBy, ExchangeDate = @ExchangeDate, Total = @Total, Promotion = @Promotion where Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("@ExChangeBy", gameResult.ExchangeBy, DbType.Int32);
+                parameters.Add("@ExchangeDate", gameResult.ExchangeDate, DbType.DateTime);
+                parameters.Add("@Id", gameResult.GameResultId, DbType.Int32);
+                parameters.Add("@Total", gameResult.Total, DbType.Decimal);
+                parameters.Add("@Promotion", gameResult.Promotion, DbType.Decimal);
+                return conn.Execute(sql, parameters) == 1;
+            }
+        }
+
+        public void InsertGameResultDetail(GameResultDetail detail) {
+            using (var conn = GetOpenConnection())
+            {
+                conn.Insert(detail);
             }
         }
     }

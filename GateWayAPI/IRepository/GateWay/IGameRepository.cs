@@ -6,12 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GateWayAPI.Models.General.GameResultModel;
+using GateWayAPI.Models.GateWay.GameResultDetail;
 
 namespace GateWayAPI.IRepository.GateWay
 {
     public interface IGameRepository
     {
         List<Game> SelectAllGames();
+        List<GameParamClient> SelectAllGameParamClient(int gameId);
         List<GameParam> SelectAllGameParam(int gameId);
         long InsertUserGameMap(AccountGameMap userGameMap);
         Task<int> CheckRound(int accountId, int gameId);
@@ -20,6 +23,8 @@ namespace GateWayAPI.IRepository.GateWay
         int CalcRound(int accountId, int gameId);
         long InsertEventResult(GameResult result);
         List<GameResult> GetResult(int gameId, int accountId);
-        bool UseCode(string code);
+        GameResultModel GetResultByCode(string code);
+        bool UseCode(GameResultModel gameResult);
+        void InsertGameResultDetail(GameResultDetail detail);
     }
 }

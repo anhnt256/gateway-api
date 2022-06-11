@@ -8,10 +8,14 @@ using GateWayManagement.Models;
 using GateWayManagement.Models.GateWay.AccountGameMap;
 using GateWayManagement.Models.GateWay.GameParam;
 using GateWayManagement.Models.GateWay.GameResult;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GateWayAPI.Controllers
@@ -36,35 +40,53 @@ namespace GateWayAPI.Controllers
             _accountRepository = accountRepository;
         }
 
+        string MoneyPerRound = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("Config")["MoneyPerRound"];
+
+        [Authorize]
         [HttpPost]
         [Route("update-round")]
         public IActionResult UpdateRound([FromBody] GameModel gameModel)
         {
-            int accountId = CheckLogin(gameModel.ip, gameModel.accountId);
+            var claimsIdentity = this.User.Identity as ClaimsIdentity;
+            int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
             if (accountId == 0)
             {
                 return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
             }
             var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
             var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
-            int totalRound = (int)totalAmount / 50000;
+            int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
             int currentRound = totalRound - usedRound;
+            if (currentRound < 0)
+            {
+                currentRound = 0;
+            }
             _gameRepository.UpdateRound(accountId, gameModel.gameId, currentRound);
 
             return Ok(new { code = ResponseCode.Success, reply = currentRound });
         }
 
+        [Authorize]
         [HttpPost]
         [Route("calc-prize")]
         public IActionResult CalcPrize([FromBody] GameModel gameModel)
         {
-            int accountId = CheckLogin(gameModel.ip, gameModel.accountId);
+            var claimsIdentity = this.User.Identity as ClaimsIdentity;
+            int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
             if (accountId == 0)
             {
                 return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
             }
-            var round = _gameRepository.CheckRound(accountId, gameModel.gameId).Result;
-            if (round == 0)
+
+            var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
+            var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
+            int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
+            int currentRound = totalRound - usedRound;
+            if (currentRound < 0)
+            {
+                currentRound = 0;
+            }
+            if (currentRound == 0)
             {
                 return Ok(new { code = ResponseCode.ParamsInvalid, reply = "" });
             }
@@ -77,22 +99,24 @@ namespace GateWayAPI.Controllers
             gameResult.IsUsed = 0;
             gameResult.AccountId = accountId;
             gameResult.ParamId = result;
-            gameResult.Code = Guid.NewGuid().ToString();
+            gameResult.Code = Get8CharacterRandomString().ToUpper();
             gameResult.GameId = gameModel.gameId;
             gameResult.ExpiratedDate = DateTime.Now.AddDays(gameParams[result].Expiry);
             gameResult.CreatedDate = DateTime.Now;
 
             _gameRepository.InsertEventResult(gameResult);
-            _gameRepository.UpdateRound(accountId, gameModel.gameId, round - 1);
+            _gameRepository.UpdateRound(accountId, gameModel.gameId, currentRound - 1);
 
-            return Ok(new { code = ResponseCode.Success, reply = new { result, round = round - 1 } });
+            return Ok(new { code = ResponseCode.Success, reply = new { result, round = currentRound - 1 } });
         }
 
+        [Authorize]
         [HttpPost]
         [Route("prize")]
         public ActionResult GetResult([FromBody] GameModel gameModel)
         {
-            int accountId = CheckLogin(gameModel.ip, gameModel.accountId);
+            var claimsIdentity = this.User.Identity as ClaimsIdentity;
+            int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
             if (accountId == 0)
             {
                 return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
@@ -102,11 +126,13 @@ namespace GateWayAPI.Controllers
             return Ok(new { code = ResponseCode.Success, reply = eventResult });
         }
 
+        [Authorize]
         [HttpPost]
         [Route("init-game")]
         public ActionResult InitGame([FromBody] GameModel gameModel)
         {
-            int accountId = CheckLogin(gameModel.ip, gameModel.accountId);
+            var claimsIdentity = this.User.Identity as ClaimsIdentity;
+            int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
             if (accountId == 0)
             {
                 return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
@@ -117,8 +143,12 @@ namespace GateWayAPI.Controllers
             {
                 var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
                 var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
-                int totalRound = (int)totalAmount / 50000;
+                int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
                 int currentRound = totalRound - usedRound;
+                if (currentRound < 0)
+                {
+                    currentRound = 0;
+                }
 
                 AccountGameMap userGameMap = new AccountGameMap();
                 userGameMap.GameId = gameModel.gameId;
@@ -128,27 +158,20 @@ namespace GateWayAPI.Controllers
 
                 return Ok(new { code = ResponseCode.Success, reply = eventResult });
             }
-            else {
+            else
+            {
                 return Ok(new { code = ResponseCode.Success, reply = "" });
             }
         }
 
-        private int CheckLogin(string ip, int userId)
+        [Authorize]
+        [HttpGet]
+        [Route("params")]
+        public ActionResult GetGameParams(int gameId)
         {
-            var computer = _accountRepository.GetRealIpFromLocalIp(ip);
-            if (computer != null)
-            {
-                User user = _userRepository.GetUserByIPAsync(computer.RealIp).Result;
-                if (user is null || user.UserId != userId)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return user.UserId;
-                }
-            }
-            return 0;
+            var eventResult = _gameRepository.SelectAllGameParamClient(gameId);
+
+            return Ok(new { code = ResponseCode.Success, reply = eventResult });
         }
 
         private int[] GenerationItems(List<GameParam> gameParams)
@@ -164,6 +187,13 @@ namespace GateWayAPI.Controllers
                 }
             }
             return items;
+        }
+
+        private string Get8CharacterRandomString()
+        {
+            string path = Path.GetRandomFileName();
+            path = path.Replace(".", ""); // Remove period.
+            return path.Substring(0, 8);  // Return 8 character string
         }
     }
 }

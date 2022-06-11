@@ -13,7 +13,6 @@ namespace GateWayAPI.Models.GateWay.Staff
         public int Id { set; get; }
         public string FullName { set; get; }
         public string UserName { set; get; }
-        public string PasswordHash { set; get; }
         public string Email { set; get; }
         public string Phone { set; get; }
         public string Token { set; get; }

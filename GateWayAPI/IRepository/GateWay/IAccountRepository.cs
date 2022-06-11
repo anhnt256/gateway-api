@@ -11,7 +11,8 @@ namespace GateWayAPI.IRepository
     {
         Computer GetRealIpFromLocalIp(string ip);
 
-        Task<Account> SelectUserFromId(int AccountId);
+        Task<Account> Auth(int AccountId);
+        Account GetAccountById(int AccountId);
         void InsertNewUser(Account account);
 
         void UpdateUser(Account account);

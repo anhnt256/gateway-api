@@ -2,6 +2,7 @@
 using GateWayAPI.DataAccessLayer;
 using GateWayAPI.IRepository.CSM;
 using GateWayAPI.Models.CSM.Payment;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,11 +42,13 @@ namespace GateWayAPI.Repository.CSM
 
         public decimal GetTotalPaymentByUserId(int userId)
         {
+            string StartGame = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("Config")["StartGame"];
+            string EndGame = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("Config")["EndGame"];
             using (var conn = GetMySQLOpenConnection())
             {
                 var sql = "select sum(amount) as amount from paymenttb " +
                     "where userId = @userId and paymentType = 4 and (VoucherNo is null or VoucherNo = '') " +
-                    "and (serveDate between cast('2022-03-30' as date) and CAST('2022-12-31' as date))";
+                    "and (serveDate between cast('" + StartGame + "' as date) and CAST('" + EndGame + "' as date))";
                 var parameters = new DynamicParameters();
                 parameters.Add("@userId", userId, System.Data.DbType.Int32);
                 return conn.ExecuteScalar(sql, parameters) is null ? 0 : (decimal)conn.ExecuteScalar(sql, parameters);

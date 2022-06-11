@@ -23,10 +23,10 @@ namespace GateWayAPI.Areas.Admin.Repository
         {
             using (var conn = GetOpenConnection())
             {
-                var sql = "select * from Staff where UserName = @UserName AND Password = @Password AND Status = 1";
+                var sql = "select * from Staff where UserName = @UserName AND PasswordHash = @PasswordHash AND IsActive = 1";
                 DynamicParameters _params = new DynamicParameters();
                 _params.Add("@UserName", username, DbType.String);
-                _params.Add("@Password", password, DbType.String);
+                _params.Add("@PasswordHash", password, DbType.String);
                 var user = conn.QueryFirstOrDefault<Staff>(sql, _params);
                 // return null if user not found
                 if (user == null)
@@ -40,15 +40,28 @@ namespace GateWayAPI.Areas.Admin.Repository
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                    new Claim(ClaimTypes.Name, user.UserName)
+                        new Claim(ClaimTypes.Name, user.Id.ToString()),
+                        new Claim(ClaimTypes.Role, user.IsAdmin.ToString())
                     }),
-                    Expires = DateTime.UtcNow.AddHours(1),
+                    Expires = DateTime.UtcNow.AddMinutes(30),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 user.Token = tokenHandler.WriteToken(token);
 
                 return user;
+            }
+        }
+
+        public bool ChangePassword(string username, string password)
+        {
+            using (var conn = GetOpenConnection())
+            {
+                var sql = "update Staff Set PasswordHash = @PasswordHash Where UserName = @UserName";
+                DynamicParameters _params = new DynamicParameters();
+                _params.Add("@UserName", username, DbType.String);
+                _params.Add("@PasswordHash", password, DbType.String);
+                return conn.Execute(sql, _params) == 1;
             }
         }
     }

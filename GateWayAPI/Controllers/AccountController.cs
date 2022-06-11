@@ -33,7 +33,7 @@ namespace GateWayAPI.Controllers
                 {
                     return Ok(new { code = ResponseCode.ParamsInvalid, reply = "" });
                 }
-                Account customUser = _accountRepository.SelectUserFromId(user.UserId).Result;
+                Account customUser = _accountRepository.Auth(user.UserId).Result;
                 if (customUser is null)
                 {
                     Account cus = new Account();
@@ -64,7 +64,7 @@ namespace GateWayAPI.Controllers
                 {
                     return Ok(new { code = ResponseCode.ParamsInvalid, reply = "" });
                 }
-                Account customUser = _accountRepository.SelectUserFromId(user.UserId).Result;
+                Account customUser = _accountRepository.GetAccountById(user.UserId);
                 if (customUser is null)
                 {
                     return Ok(new { code = ResponseCode.ParamsInvalid, reply = "" });

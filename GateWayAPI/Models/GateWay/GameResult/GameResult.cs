@@ -18,8 +18,11 @@ namespace GateWayManagement.Models.GateWay.GameResult
         public string Name { get; set; }
         public string Code { get; set; }
         public int IsUsed { get; set; }
-        public DateTime CreatedDate { set; get; }
-        public DateTime ExpiratedDate { set; get; }
+        public DateTime? CreatedDate { set; get; }
+        public DateTime? ExpiratedDate { set; get; }
         public DateTime? ExchangeDate { set; get; }
+        public int ExchangeBy { set; get; }
+        public decimal Total { set; get; }
+        public decimal Promotion { set; get; }
     }
 }
