@@ -15,13 +15,15 @@ namespace GateWayAPI.Areas.Admin.ModelHub
         private IOrderRepository _orderRepository;
         private IAccountRepository _accountRepository;
         private IComputerRepository _computerRepository;
+        private IMachineRepository _machineRepository;
         private IHubContext<AdminHub> _hub;
-        public AdminHub(IHubContext<AdminHub> hub, IOrderRepository orderRepository, IComputerRepository computerRepository, IAccountRepository accountRepository)
+        public AdminHub(IHubContext<AdminHub> hub, IOrderRepository orderRepository, IComputerRepository computerRepository, IAccountRepository accountRepository, IMachineRepository machineRepository)
         {
             _hub = hub;
             _orderRepository = orderRepository;
             _computerRepository = computerRepository;
             _accountRepository = accountRepository;
+            _machineRepository = machineRepository;
         }
 
         public async override Task OnConnectedAsync()

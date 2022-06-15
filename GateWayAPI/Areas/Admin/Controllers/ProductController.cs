@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace GateWayAPI.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class ProductController : Controller
     {
         private IProductRepository _productRepo;

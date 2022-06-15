@@ -8,6 +8,6 @@ namespace GateWayAPI.Areas.Admin.IRepository
 {
     public interface IComputerRepository
     {
-        IEnumerable<Computer> GetComputerStatus();
+        List<Computer> GetComputerStatus();
     }
 }

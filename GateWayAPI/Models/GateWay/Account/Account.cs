@@ -15,6 +15,7 @@ namespace GateWayAPI.Models.GateWay.Account
         public decimal MoneyPaid { set; get; }
         public decimal MoneyUsed { set; get; }
         public decimal RemainMoney { set; get; }
+        [Computed]
         public string Token { set; get; }
     }
 }

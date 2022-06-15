@@ -9,6 +9,8 @@ using GateWayAPI.Models.GateWay.OrderDetail;
 using GateWayAPI.Models.GateWay.Product;
 using GateWayAPI.Models.GateWay.ProductOption;
 using GateWayAPI.Models.GateWay.ProductType;
+using GateWayAPI.Models.General.OrderModel;
+using GateWayManagement.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -22,11 +24,12 @@ namespace GateWayAPI.Repository
     {
         public OrderRepository(string connectionString) : base(connectionString) { }
 
-        public IEnumerable<Orders> GetAllOrder()
+        public List<OrderModel> GetAllOrder()
         {
             using (var conn = GetOpenConnection())
             {
-                return conn.GetAll<Orders>();
+                var sql = "[sp_Admin_GetAllOrder]";
+                return conn.Query<OrderModel>(sql, commandType: CommandType.StoredProcedure).ToList();
             }
         }
 

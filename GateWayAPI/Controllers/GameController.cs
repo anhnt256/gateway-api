@@ -164,7 +164,6 @@ namespace GateWayAPI.Controllers
             }
         }
 
-        [Authorize]
         [HttpGet]
         [Route("params")]
         public ActionResult GetGameParams(int gameId)

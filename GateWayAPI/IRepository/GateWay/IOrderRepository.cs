@@ -1,5 +1,6 @@
 ﻿using GateWayAPI.Models.GateWay.Order;
 using GateWayAPI.Models.GateWay.OrderDetail;
+using GateWayAPI.Models.General.OrderModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace GateWayAPI.IRepository
 {
     public interface IOrderRepository
     {
-        IEnumerable<Orders> GetAllOrder();
+        List<OrderModel> GetAllOrder();
         long InsertOrder(Orders order);
         void InsertOrderDetail(OrderDetail order);
 

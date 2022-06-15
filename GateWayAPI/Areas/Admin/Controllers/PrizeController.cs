@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace GateWayAPI.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class PrizeController : Controller
     {
         private IGameRepository _gameRepo;

@@ -6897,11 +6897,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Project\\GateWay\\API\\GateWayAPI\\GateWayAPI\\GateWayAPI.csproj",
+      "projectUniqueName": "C:\\Project\\GateWay\\gateway-api\\GateWayAPI\\GateWayAPI.csproj",
       "projectName": "GateWayAPI",
-      "projectPath": "C:\\Project\\GateWay\\API\\GateWayAPI\\GateWayAPI\\GateWayAPI.csproj",
+      "projectPath": "C:\\Project\\GateWay\\gateway-api\\GateWayAPI\\GateWayAPI.csproj",
       "packagesPath": "C:\\Users\\Nguyen Anh\\.nuget\\packages\\",
-      "outputPath": "C:\\Project\\GateWay\\API\\GateWayAPI\\GateWayAPI\\obj\\",
+      "outputPath": "C:\\Project\\GateWay\\gateway-api\\GateWayAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Nguyen Anh\\AppData\\Roaming\\NuGet\\NuGet.Config",

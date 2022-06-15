@@ -1,9 +1,11 @@
 ﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using GateWayAPI.Areas.Admin.IRepository;
 using GateWayAPI.DataAccessLayer;
 using GateWayAPI.Models.GateWay.Computer;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,12 +15,12 @@ namespace GateWayAPI.Areas.Admin.Repository
     {
         public ComputerRepository(string connectionString) : base(connectionString) { }
 
-        public IEnumerable<Computer> GetComputerStatus()
+        public List<Computer> GetComputerStatus()
         {
             using (var conn = GetMySQLOpenConnection())
             {
-                var sql = "select distinct(machineName), log.userid, log.status, log.IpAddress as 'realIP', machinename as name from systemlogtb log inner join clientsystb clientSys on clientSys.CPName = log.MachineName group by log.machinename order by enterDate desc;";
-                return conn.Query<Computer>(sql);
+                var sql = "select distinct machinename as name, status, userid from (select machinename, status, userid from systemlogtb order by concat(EnterDate, ' ', EnterTime) desc) as system group by machinename;";
+                return conn.Query<Computer>(sql).ToList();
             }
         }
     }

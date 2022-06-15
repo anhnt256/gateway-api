@@ -20,5 +20,7 @@ namespace GateWayAPI.Models.GateWay.ProductOption
         public bool IsDefault { set; get; }
         public bool IsMultiple { set; get; }
         public bool IsRequire { set; get; }
+        [Computed]
+        public int Quantity { set; get; }
     }
 }

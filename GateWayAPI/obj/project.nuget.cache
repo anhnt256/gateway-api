@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "hI0e1qi+vazu/HkL3Kq76GqOkkazJMT8E1OGeF9UjEzxaGBtWEyKczuEiTPDF8DF76X0L4P7kGpdkXk7Co1u5Q==",
+  "dgSpecHash": "RnMcVDSt7MBLWCKslDwpv0osE5qjVHMERLFstsGMv+NVZvYjSE0ITBl/c8QLXJAfLQhmLTbzuVSV31NFPT4Ekg==",
   "success": true,
-  "projectFilePath": "C:\\Project\\GateWay\\API\\GateWayAPI\\GateWayAPI\\GateWayAPI.csproj",
+  "projectFilePath": "C:\\Project\\GateWay\\gateway-api\\GateWayAPI\\GateWayAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Nguyen Anh\\.nuget\\packages\\bouncycastle.netcore\\1.8.3\\bouncycastle.netcore.1.8.3.nupkg.sha512",
     "C:\\Users\\Nguyen Anh\\.nuget\\packages\\dapper\\2.0.30\\dapper.2.0.30.nupkg.sha512",

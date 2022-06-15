@@ -10,5 +10,6 @@ namespace GateWayAPI.Models.General.OrderModel
     public class OrderModel: Orders
     {
         public List<OrderDetail> Details { set; get; }
+        public string OrderDetail { set; get; }
     }
 }

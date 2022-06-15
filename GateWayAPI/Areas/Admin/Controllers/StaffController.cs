@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace GateWayAPI.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class StaffController : GlobalController
     {
         private IStaffRepository _staffRepo;
@@ -24,6 +25,10 @@ namespace GateWayAPI.Areas.Admin.Controllers
         {
             _staffRepo = staffRepo;
         }
+        public ActionResult Index() {
+            return Ok(new { code = ResponseCode.ParamsInvalid, reply = "Tên tài khoản hoặc mật khẩu không đúng." });
+        }
+
 
         [AllowAnonymous]
         [HttpPost]

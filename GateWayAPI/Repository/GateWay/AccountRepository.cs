@@ -29,7 +29,8 @@ namespace GateWayAPI.Repository
                 var parameters = new DynamicParameters();
                 parameters.Add("@AccountId", AccountId, DbType.Int32);
                 var user = await conn.QueryFirstOrDefaultAsync<Account>(sql, parameters);
-
+                if (user == null)
+                    return null;
                 // authentication successful so generate jwt token
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var secret = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("GeneralSetting")["Secret"];

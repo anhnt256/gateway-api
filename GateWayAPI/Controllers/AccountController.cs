@@ -3,6 +3,7 @@ using GateWayAPI.IRepository.CSM;
 using GateWayAPI.Models.CSM.User;
 using GateWayAPI.Models.GateWay.Account;
 using GateWayManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace GateWayAPI.Controllers
             _accountRepository = accountRepository;
             _userRepository = userRepository;
         }
-
+        [AllowAnonymous]
         [HttpPost]
         public IActionResult AutoLogin([FromBody] User localUser)
         {
@@ -53,6 +54,7 @@ namespace GateWayAPI.Controllers
             return Ok(new { code = ResponseCode.ParamsInvalid, reply = "" });
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public IActionResult UpdateAccount([FromBody] User localUser)
         {

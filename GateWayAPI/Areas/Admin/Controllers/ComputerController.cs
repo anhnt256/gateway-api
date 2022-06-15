@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace GateWayAPI.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class ComputerController : Controller
     {
         public IActionResult Index()
