@@ -13,6 +13,6 @@ namespace GateWayAPI.IRepository
         List<OrderModel> GetAllOrder();
         long InsertOrder(Orders order);
         void InsertOrderDetail(OrderDetail order);
-
+        bool UpdateOrder(Orders order);
     }
 }

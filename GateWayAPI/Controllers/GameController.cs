@@ -128,6 +128,16 @@ namespace GateWayAPI.Controllers
 
         [Authorize]
         [HttpPost]
+        [Route("server-prize")]
+        public ActionResult GetServerResult([FromBody] GameModel gameModel)
+        {
+            var eventResult = _gameRepository.GetServerResult(gameModel.gameId);
+
+            return Ok(new { code = ResponseCode.Success, reply = eventResult });
+        }
+
+        [Authorize]
+        [HttpPost]
         [Route("init-game")]
         public ActionResult InitGame([FromBody] GameModel gameModel)
         {
@@ -139,17 +149,18 @@ namespace GateWayAPI.Controllers
             }
 
             var game = _gameRepository.CheckExist(accountId, gameModel.gameId).Result;
+
+            var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
+            var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
+            int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
+            int currentRound = totalRound - usedRound;
+            if (currentRound < 0)
+            {
+                currentRound = 0;
+            }
+
             if (game is null)
             {
-                var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
-                var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
-                int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
-                int currentRound = totalRound - usedRound;
-                if (currentRound < 0)
-                {
-                    currentRound = 0;
-                }
-
                 AccountGameMap userGameMap = new AccountGameMap();
                 userGameMap.GameId = gameModel.gameId;
                 userGameMap.AccountId = accountId;
@@ -160,7 +171,7 @@ namespace GateWayAPI.Controllers
             }
             else
             {
-                return Ok(new { code = ResponseCode.Success, reply = "" });
+                return Ok(new { code = ResponseCode.Success, reply = currentRound });
             }
         }
 

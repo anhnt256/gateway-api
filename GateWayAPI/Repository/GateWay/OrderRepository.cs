@@ -48,5 +48,12 @@ namespace GateWayAPI.Repository
                 conn.Insert(order);
             }
         }
+
+        public bool UpdateOrder(Orders order) {
+            using (var conn = GetOpenConnection())
+            {
+                return conn.Update<Orders>(order);
+            }
+        }
     }
 }

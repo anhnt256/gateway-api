@@ -54,29 +54,33 @@ namespace GateWayAPI.Controllers
         {
             var claimsIdentity = this.User.Identity as ClaimsIdentity;
             int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
-            if (accountId == 0)
+            if (accountId != 0)
             {
+                Orders order = new Orders();
+                order.TotalItem = orderModel.TotalItem;
+                order.TotalMoney = orderModel.TotalMoney;
+                order.CreatedDate = DateTime.Now;
+                order.Status = (int)OrderStatus.Received;
+                order.AccountId = accountId;
+                order.Note = "";
+
+                var orderId = _orderRepository.InsertOrder(order);
+
+                if (orderId != 0)
+                {
+                    foreach (var detail in orderModel.Details)
+                    {
+                        detail.OrderId = int.Parse(orderId.ToString());
+                        _orderRepository.InsertOrderDetail(detail);
+                    }
+                }
+
+                return Ok(new { code = ResponseCode.Success, reply = "" });
+            }
+            else {
                 return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
             }
-            Orders order = new Orders();
-            order.TotalItem = orderModel.TotalItem;
-            order.TotalMoney = orderModel.TotalMoney;
-            order.CreatedDate = DateTime.Now;
-            order.Status = (int)OrderStatus.Received;
-            order.AccountId = accountId;
-            order.Note = "";
 
-            var orderId = _orderRepository.InsertOrder(order);
-
-            if (orderId != 0) {
-                foreach (var detail in orderModel.Details)
-                {
-                    detail.OrderId = int.Parse(orderId.ToString());
-                    _orderRepository.InsertOrderDetail(detail);
-                }
-            }
-
-            return Ok();
         }
     }
 }

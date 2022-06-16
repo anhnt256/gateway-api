@@ -23,6 +23,7 @@ namespace GateWayAPI.IRepository.GateWay
         int CalcRound(int accountId, int gameId);
         long InsertEventResult(GameResult result);
         List<GameResult> GetResult(int gameId, int accountId);
+        List<GameResult> GetServerResult(int gameId);
         GameResultModel GetResultByCode(string code);
         bool UseCode(GameResultModel gameResult);
         void InsertGameResultDetail(GameResultDetail detail);

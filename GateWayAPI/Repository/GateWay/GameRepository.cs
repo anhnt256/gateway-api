@@ -142,6 +142,20 @@ namespace GateWayAPI.Repository.GateWay
             }
         }
 
+        public List<GameResult> GetServerResult(int gameId)
+        {
+            using (var conn = GetOpenConnection())
+            {
+                var sql = "Select top (100) e.createdDate, p.name, UPPER('xxx' + SUBSTRING(a.username, 1, 3)) as userName from GameResult e " +
+                    "inner join gameparam p on e.paramId = p.id " +
+                    "inner join account a on a.id = e.AccountId " +
+                    "where e.gameId = @gameId " +
+                    "order by e.Id DESC";
+                var parameters = new DynamicParameters();
+                parameters.Add("@gameId", gameId, System.Data.DbType.Int32);
+                return conn.Query<GameResult>(sql, parameters).ToList();
+            }
+        }
         public GameResultModel GetResultByCode(string code)
         {
             using (var conn = GetOpenConnection())
