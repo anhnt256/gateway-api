@@ -13,6 +13,7 @@ namespace GateWayAPI.IRepository
 
         Task<Account> Auth(int AccountId);
         Account GetAccountById(int AccountId);
+        Account GetAccountByUserName(string UserName);
         void InsertNewUser(Account account);
 
         void UpdateUser(Account account);

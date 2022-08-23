@@ -41,29 +41,46 @@ namespace GateWayAPI.Controllers
         }
 
         string MoneyPerRound = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("Config")["MoneyPerRound"];
+        string StartGame = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("Config")["StartGame"];
+        string EndGame = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("Config")["EndGame"];
 
         [Authorize]
         [HttpPost]
         [Route("update-round")]
         public IActionResult UpdateRound([FromBody] GameModel gameModel)
         {
-            var claimsIdentity = this.User.Identity as ClaimsIdentity;
-            int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
-            if (accountId == 0)
+            if (CheckLogin(gameModel.ip) == gameModel.accountId)
             {
-                return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
-            }
-            var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
-            var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
-            int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
-            int currentRound = totalRound - usedRound;
-            if (currentRound < 0)
-            {
-                currentRound = 0;
-            }
-            _gameRepository.UpdateRound(accountId, gameModel.gameId, currentRound);
+                DateTime currentDate = DateTime.Now;
+                if (currentDate >= DateTime.Parse(EndGame))
+                {
+                    return Ok(new { code = ResponseCode.ServerError, reply = "Chương trình đã kết thúc" });
+                }
+                else
+                {
+                    var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                    int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
+                    if (accountId == 0)
+                    {
+                        return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
+                    }
+                    var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
+                    var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
+                    int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
+                    int currentRound = totalRound - usedRound;
+                    if (currentRound < 0)
+                    {
+                        currentRound = 0;
+                    }
+                    _gameRepository.UpdateRound(accountId, gameModel.gameId, currentRound);
 
-            return Ok(new { code = ResponseCode.Success, reply = currentRound });
+                    return Ok(new { code = ResponseCode.Success, reply = currentRound });
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         [Authorize]
@@ -71,43 +88,58 @@ namespace GateWayAPI.Controllers
         [Route("calc-prize")]
         public IActionResult CalcPrize([FromBody] GameModel gameModel)
         {
-            var claimsIdentity = this.User.Identity as ClaimsIdentity;
-            int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
-            if (accountId == 0)
+            if (CheckLogin(gameModel.ip) == gameModel.accountId)
             {
-                return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
-            }
+                DateTime currentDate = DateTime.Now;
+                if (currentDate >= DateTime.Parse(EndGame))
+                {
+                    return Ok(new { code = ResponseCode.ServerError, reply = "Chương trình đã kết thúc" });
+                }
+                else
+                {
+                    var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                    int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
+                    if (accountId == 0)
+                    {
+                        return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
+                    }
 
-            var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
-            var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
-            int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
-            int currentRound = totalRound - usedRound;
-            if (currentRound < 0)
+                    var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
+                    var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
+                    int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
+                    int currentRound = totalRound - usedRound;
+                    if (currentRound < 0)
+                    {
+                        currentRound = 0;
+                    }
+                    if (currentRound == 0)
+                    {
+                        return Ok(new { code = ResponseCode.ParamsInvalid, reply = "" });
+                    }
+                    var gameParams = _gameRepository.SelectAllGameParam(gameModel.gameId);
+                    var items = GenerationItems(gameParams);
+                    Random random = new Random();
+                    var result = items[random.Next(items.Length)];
+
+                    GameResult gameResult = new GameResult();
+                    gameResult.IsUsed = 0;
+                    gameResult.AccountId = accountId;
+                    gameResult.ParamId = result;
+                    gameResult.Code = Get8CharacterRandomString().ToUpper();
+                    gameResult.GameId = gameModel.gameId;
+                    gameResult.ExpiratedDate = DateTime.Now.AddDays(gameParams[result - 1].Expiry);
+                    gameResult.CreatedDate = DateTime.Now;
+
+                    _gameRepository.InsertEventResult(gameResult);
+                    _gameRepository.UpdateRound(accountId, gameModel.gameId, currentRound - 1);
+
+                    return Ok(new { code = ResponseCode.Success, reply = new { result, round = currentRound - 1 } });
+                }
+            }
+            else
             {
-                currentRound = 0;
+                return Unauthorized();
             }
-            if (currentRound == 0)
-            {
-                return Ok(new { code = ResponseCode.ParamsInvalid, reply = "" });
-            }
-            var gameParams = _gameRepository.SelectAllGameParam(gameModel.gameId);
-            var items = GenerationItems(gameParams);
-            Random random = new Random();
-            var result = items[random.Next(items.Length)];
-
-            GameResult gameResult = new GameResult();
-            gameResult.IsUsed = 0;
-            gameResult.AccountId = accountId;
-            gameResult.ParamId = result;
-            gameResult.Code = Get8CharacterRandomString().ToUpper();
-            gameResult.GameId = gameModel.gameId;
-            gameResult.ExpiratedDate = DateTime.Now.AddDays(gameParams[result].Expiry);
-            gameResult.CreatedDate = DateTime.Now;
-
-            _gameRepository.InsertEventResult(gameResult);
-            _gameRepository.UpdateRound(accountId, gameModel.gameId, currentRound - 1);
-
-            return Ok(new { code = ResponseCode.Success, reply = new { result, round = currentRound - 1 } });
         }
 
         [Authorize]
@@ -115,15 +147,22 @@ namespace GateWayAPI.Controllers
         [Route("prize")]
         public ActionResult GetResult([FromBody] GameModel gameModel)
         {
-            var claimsIdentity = this.User.Identity as ClaimsIdentity;
-            int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
-            if (accountId == 0)
+            if (CheckLogin(gameModel.ip) == gameModel.accountId)
             {
-                return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
-            }
-            var eventResult = _gameRepository.GetResult(gameModel.gameId, accountId);
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
+                if (accountId == 0)
+                {
+                    return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
+                }
+                var eventResult = _gameRepository.GetResult(gameModel.gameId, accountId);
 
-            return Ok(new { code = ResponseCode.Success, reply = eventResult });
+                return Ok(new { code = ResponseCode.Success, reply = eventResult });
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         [Authorize]
@@ -141,37 +180,51 @@ namespace GateWayAPI.Controllers
         [Route("init-game")]
         public ActionResult InitGame([FromBody] GameModel gameModel)
         {
-            var claimsIdentity = this.User.Identity as ClaimsIdentity;
-            int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
-            if (accountId == 0)
-            {
-                return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
-            }
+            if (CheckLogin(gameModel.ip) == gameModel.accountId) {
+                DateTime currentDate = DateTime.Now;
+                if (currentDate >= DateTime.Parse(EndGame))
+                {
+                    return Ok(new { code = ResponseCode.ServerError, reply = 0 });
+                }
+                else
+                {
+                    var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                    int accountId = int.Parse(claimsIdentity.FindFirst(ClaimTypes.Name)?.Value);
+                    if (accountId == 0)
+                    {
+                        return Ok(new { code = ResponseCode.RequiredLogin, reply = "" });
+                    }
 
-            var game = _gameRepository.CheckExist(accountId, gameModel.gameId).Result;
+                    var game = _gameRepository.CheckExist(accountId, gameModel.gameId).Result;
 
-            var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
-            var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
-            int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
-            int currentRound = totalRound - usedRound;
-            if (currentRound < 0)
-            {
-                currentRound = 0;
-            }
+                    var totalAmount = _paymentRepository.GetTotalPaymentByUserId(accountId);
+                    var usedRound = _gameRepository.GetResult(gameModel.gameId, accountId).Count;
+                    int totalRound = (int)totalAmount / int.Parse(MoneyPerRound);
+                    int currentRound = totalRound - usedRound;
+                    if (currentRound < 0)
+                    {
+                        currentRound = 0;
+                    }
 
-            if (game is null)
-            {
-                AccountGameMap userGameMap = new AccountGameMap();
-                userGameMap.GameId = gameModel.gameId;
-                userGameMap.AccountId = accountId;
-                userGameMap.Round = int.Parse(currentRound.ToString());
-                var eventResult = _gameRepository.InsertUserGameMap(userGameMap);
+                    if (game is null)
+                    {
+                        AccountGameMap userGameMap = new AccountGameMap();
+                        userGameMap.GameId = gameModel.gameId;
+                        userGameMap.AccountId = accountId;
+                        userGameMap.Round = int.Parse(currentRound.ToString());
+                        var eventResult = _gameRepository.InsertUserGameMap(userGameMap);
 
-                return Ok(new { code = ResponseCode.Success, reply = eventResult });
+                        return Ok(new { code = ResponseCode.Success, reply = eventResult });
+                    }
+                    else
+                    {
+                        return Ok(new { code = ResponseCode.Success, reply = currentRound });
+                    }
+                }
             }
             else
             {
-                return Ok(new { code = ResponseCode.Success, reply = currentRound });
+                return Unauthorized();
             }
         }
 
@@ -204,6 +257,15 @@ namespace GateWayAPI.Controllers
             string path = Path.GetRandomFileName();
             path = path.Replace(".", ""); // Remove period.
             return path.Substring(0, 8);  // Return 8 character string
+        }
+
+        private int CheckLogin(string ip) {
+            var computer = _accountRepository.GetRealIpFromLocalIp(ip);
+            var result = _userRepository.GetUserByIPAsync(computer.RealIp).Result;
+            if (result != null) {
+                return result.UserId;
+            }
+            return 0;
         }
     }
 }

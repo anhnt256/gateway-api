@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Data;
 using GateWayAPI.Models.General.GameResultModel;
 using GateWayAPI.Models.GateWay.GameResultDetail;
+using Microsoft.Extensions.Configuration;
 
 namespace GateWayAPI.Repository.GateWay
 {
@@ -33,7 +34,7 @@ namespace GateWayAPI.Repository.GateWay
         {
             using (var conn = GetOpenConnection())
             {
-                var sql = "Select * from GameParam where gameId = @gameId";
+                var sql = "Select * from GameParam where gameId = @gameId AND IsActive = 1";
                 var parameters = new DynamicParameters();
                 parameters.Add("@gameId", gameId, System.Data.DbType.Int32);
                 return conn.Query<GameParamClient>(sql, parameters).ToList();
@@ -44,7 +45,7 @@ namespace GateWayAPI.Repository.GateWay
         {
             using (var conn = GetOpenConnection())
             {
-                var sql = "Select * from GameParam where gameId = @gameId";
+                var sql = "Select * from GameParam where gameId = @gameId AND IsActive = 1";
                 var parameters = new DynamicParameters();
                 parameters.Add("@gameId", gameId, System.Data.DbType.Int32);
                 return conn.Query<GameParam>(sql, parameters).ToList();
@@ -129,11 +130,14 @@ namespace GateWayAPI.Repository.GateWay
 
         public List<GameResult> GetResult(int gameId, int accountId)
         {
+            string StartGame = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("Config")["StartGame"];
+            string EndGame = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("Config")["EndGame"];
             using (var conn = GetOpenConnection())
             {
                 var sql = "Select e.*, p.name from GameResult e " +
                     "inner join gameparam p on e.paramId = p.id " +
                     "where e.gameId = @gameId and accountId = @accountId " +
+                    "and (CreatedDate between cast('" + StartGame + "' as date) and CAST('" + EndGame + "' as date))" +
                     "order by e.Id DESC";
                 var parameters = new DynamicParameters();
                 parameters.Add("@gameId", gameId, System.Data.DbType.Int32);

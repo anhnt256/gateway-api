@@ -9,5 +9,6 @@ namespace GateWayAPI.Areas.Admin.IRepository
     public interface IMachineRepository
     {
         IEnumerable<Computer> GetAllComputers();
+        int UpdateComputer(string name, int status);
     }
 }

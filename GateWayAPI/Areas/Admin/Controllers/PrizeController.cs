@@ -36,7 +36,7 @@ namespace GateWayAPI.Areas.Admin.Controllers
 
         [Authorize]
         [HttpGet]
-        public IActionResult ExchangePrize(string Code)
+        public IActionResult ExchangePrize(string Code, string machineName)
         {
             var result = _gameRepo.GetResultByCode(Code);
             if (result != null)

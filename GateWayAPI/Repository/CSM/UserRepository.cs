@@ -25,6 +25,5 @@ namespace GateWayAPI.Repository.CSM
                 return await conn.QueryFirstOrDefaultAsync<User>(sql, parameters);
             }
         }
-
     }
 }

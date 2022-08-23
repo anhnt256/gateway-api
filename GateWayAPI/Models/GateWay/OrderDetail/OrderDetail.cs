@@ -13,6 +13,7 @@ namespace GateWayAPI.Models.GateWay.OrderDetail
         public int Id { set; get; }
         public int OrderId { set; get; }
         public int ProductId { set; get; }
+        public int ProductTypeId { set; get; }
         public string Name { set; get; }
         public string Avatar { set; get; }
         public int Quantity { set; get; }

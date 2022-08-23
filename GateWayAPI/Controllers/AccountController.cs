@@ -44,7 +44,7 @@ namespace GateWayAPI.Controllers
                     return Ok(new { code = ResponseCode.ParamsInvalid, reply = "" });
                 }
 
-                if (customUser.UserName == null)
+                if (string.IsNullOrWhiteSpace(customUser.UserName))
                 {
                     return Ok(new { code = ResponseCode.RequireUserName, reply = "" });
                 }

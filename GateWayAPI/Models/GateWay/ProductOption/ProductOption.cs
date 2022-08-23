@@ -17,10 +17,8 @@ namespace GateWayAPI.Models.GateWay.ProductOption
         public int Min { set; get; }
         public int Max { set; get; }
         public double SalePrice { set; get; }
-        public bool IsDefault { set; get; }
-        public bool IsMultiple { set; get; }
-        public bool IsRequire { set; get; }
-        [Computed]
         public int Quantity { set; get; }
+        [Computed]
+        public int Amount { set; get; }
     }
 }

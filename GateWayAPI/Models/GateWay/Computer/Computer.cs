@@ -16,7 +16,6 @@ namespace GateWayAPI.Models.GateWay.Computer
         public string Name { set; get; }
         public string RealIp { set; get; }
         public int UserId { set; get; }
-        [Computed]
         public int Status { set; get; }
         [Computed]
         public string UserName { set; get; }

@@ -11,7 +11,6 @@ namespace GateWayManagement.Models.GateWay.GameResult
     {
         public int Id { get; set; }
         public int AccountId { get; set; }
-        [Computed]
         public string UserName { get; set; }
         public int GameId { get; set; }
         public int ParamId { get; set; }

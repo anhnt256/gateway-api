@@ -45,6 +45,7 @@ namespace GateWayAPI.Areas.Admin.ModelHub
                     if (account != null)
                     {
                         listComputer[i].UserName = account.UserName;
+                        listComputer[i].UserId = account.Id;
                     }
                 }
             }

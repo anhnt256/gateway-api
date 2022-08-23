@@ -22,7 +22,8 @@ namespace GateWayAPI.Repository
     {
         public AccountRepository(string connectionString) : base(connectionString) { }
 
-        public async Task<Account> Auth(int AccountId) {
+        public async Task<Account> Auth(int AccountId)
+        {
             using (var conn = GetOpenConnection())
             {
                 string sql = "SELECT * FROM Account WHERE Id=@AccountId";
@@ -51,10 +52,19 @@ namespace GateWayAPI.Repository
             }
         }
 
-        public Account GetAccountById(int AccountId) {
+        public Account GetAccountById(int AccountId)
+        {
             using (var conn = GetOpenConnection())
             {
                 return conn.Get<Account>(AccountId);
+            }
+        }
+
+        public Account GetAccountByUserName(string UserName)
+        {
+            using (var conn = GetOpenConnection())
+            {
+                return conn.GetAll<Account>().Where(x => x.UserName == UserName).FirstOrDefault();
             }
         }
 
@@ -69,7 +79,8 @@ namespace GateWayAPI.Repository
             }
         }
 
-        public void UpdateUser(Account account) {
+        public void UpdateUser(Account account)
+        {
             using (var conn = GetOpenConnection())
             {
                 conn.Update(account);

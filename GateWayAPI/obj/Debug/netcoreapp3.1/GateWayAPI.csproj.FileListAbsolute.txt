@@ -117,3 +117,4 @@ C:\Project\GateWay\gateway-api\GateWayAPI\obj\Debug\netcoreapp3.1\GateWayAPI.Raz
 C:\Project\GateWay\gateway-api\GateWayAPI\obj\Debug\netcoreapp3.1\GateWayAPI.dll
 C:\Project\GateWay\gateway-api\GateWayAPI\obj\Debug\netcoreapp3.1\GateWayAPI.pdb
 C:\Project\GateWay\gateway-api\GateWayAPI\obj\Debug\netcoreapp3.1\GateWayAPI.genruntimeconfig.cache
+C:\Project\GateWay\gateway-api\GateWayAPI\obj\Debug\netcoreapp3.1\GateWayAPI.csproj.AssemblyReference.cache

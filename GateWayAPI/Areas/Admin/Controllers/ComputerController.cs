@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GateWayAPI.Areas.Admin.IRepository;
+using GateWayManagement.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +12,19 @@ namespace GateWayAPI.Areas.Admin.Controllers
     [Area("Admin")]
     public class ComputerController : Controller
     {
-        public IActionResult Index()
+        private IMachineRepository _machineRepository;
+
+        public ComputerController(IMachineRepository machineRepository)
         {
-            return View();
+            _machineRepository = machineRepository;
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult GetAllComputer()
+        {
+            var result = _machineRepository.GetAllComputers();
+            return Ok(new { code = ResponseCode.Success, reply = result });
         }
     }
 }
