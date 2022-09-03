@@ -34,14 +34,17 @@ namespace GateWayAPI.Areas.Admin.Controllers
             {
                 foreach (var order in orders)
                 {
-                    order.Details = JsonConvert.DeserializeObject<List<OrderDetail>>(order.OrderDetail);
-                    if (order.Details.Count > 0)
+                    if (order.OrderDetail != null)
                     {
-                        foreach (var detail in order.Details)
+                        order.Details = JsonConvert.DeserializeObject<List<OrderDetail>>(order.OrderDetail);
+                        if (order.Details.Count > 0)
                         {
-                            if (!string.IsNullOrEmpty(detail.JsonOptions))
+                            foreach (var detail in order.Details)
                             {
-                                detail.Options = JsonConvert.DeserializeObject<List<ProductOption>>(detail.JsonOptions);
+                                if (!string.IsNullOrEmpty(detail.JsonOptions))
+                                {
+                                    detail.Options = JsonConvert.DeserializeObject<List<ProductOption>>(detail.JsonOptions);
+                                }
                             }
                         }
                     }

@@ -1,4 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
+using GateWayAPI.Models.GateWay.Order;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,5 +26,13 @@ namespace GateWayAPI.Models.GateWay.Report
         public int TotalAccount { set; get; }
         public DateTime ReportDate { set; get; }
         public string UploadESaleMoney { set; get; }
+        [Computed]
+        public List<Orders> Orders { set; get; }
+        [Computed]
+        public string OrderJSON { set; get; }
+        [Computed]
+        public List<OrderDetail.OrderDetail> OrderDetails { set; get; }
+        [Computed]
+        public string OrderDetailJSON { set; get; }
     }
 }

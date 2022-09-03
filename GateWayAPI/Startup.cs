@@ -112,6 +112,7 @@ namespace GateWayAPI
             services.AddSingleton<IProductRepository>(x => new ProductRepository(Configuration.GetConnectionString("GateWay")));
             services.AddSingleton<IOrderRepository>(x => new OrderRepository(Configuration.GetConnectionString("GateWay")));
             services.AddSingleton<IMachineRepository>(x => new MachineRepository(Configuration.GetConnectionString("GateWay")));
+            services.AddSingleton<IReportRepository>(x => new ReportRepository(Configuration.GetConnectionString("GateWay")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

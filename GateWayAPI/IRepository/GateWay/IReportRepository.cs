@@ -13,6 +13,6 @@ namespace GateWayAPI.IRepository
 {
     public interface IReportRepository
     {
-        Report GetReportInfo(DateTime FromDate, DateTime ToDate);
+        Report GetReportInfo(string FromDate, string ToDate, int StaffId);
     }
 }

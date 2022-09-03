@@ -13,6 +13,8 @@ namespace GateWayAPI.Models.GateWay.Order
         public int Id { set; get; }
         public int? VoucherId { set; get; }
         public int AccountId { set; get; }
+        [Computed]
+        public string UserName { set; get; }
         public int TotalItem { set; get; }
         public decimal TotalMoney { set; get; }
         public int Status { set; get; }

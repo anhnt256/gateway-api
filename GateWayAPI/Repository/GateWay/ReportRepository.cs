@@ -21,13 +21,14 @@ namespace GateWayAPI.Repository
     {
         public ReportRepository(string connectionString) : base(connectionString) { }
 
-        public Report GetReportInfo(DateTime FromDate, DateTime ToDate) {
+        public Report GetReportInfo(string FromDate, string ToDate, int StaffId) {
             using (var conn = GetOpenConnection())
             {
                 var sql = "[sp_Admin_GetReportBasicInfo]";
                 var parameters = new DynamicParameters();
-                parameters.Add("@FromDate", FromDate, DbType.DateTime);
-                parameters.Add("@ToDate", ToDate, DbType.DateTime);
+                parameters.Add("@FromDate", FromDate, DbType.String);
+                parameters.Add("@ToDate", ToDate, DbType.String);
+                parameters.Add("@StaffId", StaffId, DbType.Int32);
                 return conn.Query<Report>(sql, parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
             }
         }

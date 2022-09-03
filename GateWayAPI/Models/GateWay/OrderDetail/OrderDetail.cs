@@ -15,11 +15,15 @@ namespace GateWayAPI.Models.GateWay.OrderDetail
         public int ProductId { set; get; }
         public int ProductTypeId { set; get; }
         public string Name { set; get; }
+        [Computed]
+        public int Total { set; get; }
         public string Avatar { set; get; }
         public int Quantity { set; get; }
         public decimal SalePrice { set; get; }
         public string JsonOptions { set; get; }
         [Computed]
         public List<ProductOption.ProductOption> Options { set; get; }
+        [Computed]
+        public DateTime CreatedDate { set; get; }
     }
 }
